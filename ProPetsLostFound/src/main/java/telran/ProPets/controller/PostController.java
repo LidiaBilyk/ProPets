@@ -1,5 +1,7 @@
 package telran.ProPets.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +67,11 @@ public class PostController {
 	@PostMapping("/founds/filter")
 	public PageDto getMatchingFounds(@RequestParam Integer pageSize, @RequestParam Integer pageNumber, @RequestBody PostDto postDto) {
 		return postService.getMatchingFounds(pageSize, pageNumber, postDto);
+	}
+	
+	@GetMapping("tags&colors")
+	public List<String> getTags(@RequestParam(value = "image_url") String imageUrl) {
+		return postService.getTags(imageUrl);
 	}
 	
 }

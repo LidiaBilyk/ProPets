@@ -38,10 +38,11 @@ public class AuthenticationFilter implements Filter{
 			String auth = request.getHeader("X-Token");
 			HttpHeaders headers = new HttpHeaders();
 			headers.add("X-Token", auth);
-			RestTemplate restTemplate = new RestTemplate();			
+			RestTemplate restTemplate = new RestTemplate();	
+			ResponseEntity<String> restResponse = null;
 			try {
 				RequestEntity<String> restRequest = new RequestEntity<>(headers, HttpMethod.GET, new URI("http://localhost:8080/en/account/v1/token/validation"));				
-				ResponseEntity<String> restResponse = restTemplate.exchange(restRequest, String.class);				
+				restResponse = restTemplate.exchange(restRequest, String.class);				
 			} catch (URISyntaxException e) {
 				response.sendError(400, "Bad request");
 			}catch (HttpClientErrorException e) {				
@@ -49,7 +50,9 @@ public class AuthenticationFilter implements Filter{
 					response.sendError(401, "Header Authorization is not valid");
 					return;
 				}
-			}			
+			}
+			String jwt = restResponse.getHeaders().getFirst("X-Token");			
+			response.addHeader("X-Token", jwt);
 		}
 		chain.doFilter(request, response);
 	}

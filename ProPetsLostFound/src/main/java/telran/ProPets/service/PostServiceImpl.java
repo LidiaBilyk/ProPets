@@ -1,6 +1,7 @@
 package telran.ProPets.service;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,12 +11,20 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import telran.ProPets.dao.PostRepository;
 import telran.ProPets.dto.PageDto;
 import telran.ProPets.dto.PostDto;
+import telran.ProPets.dto.imagga.TagResponseDto;
+import telran.ProPets.dto.imagga.ColorResponseDto;
 import telran.ProPets.exceptions.NotFoundException;
 import telran.ProPets.model.Post;
 
@@ -170,4 +179,27 @@ public class PostServiceImpl implements PostService {
 				.build();
 	}
 
+	@Override
+	public List<String> getTags(String imageUrl) {
+		String colorUrl = "https://api.imagga.com/v2/colors";
+		String tagUrl = "https://api.imagga.com/v2/tags";
+		String headerKey = "Basic YWNjXzc1NjU0MzllNDQ5ZjAyOTozZTNlYjQzMmI0YzFmZDEyNGM3ZTI2MDk4NTFmZDk0Ng==";
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", headerKey);		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(colorUrl).queryParam("image_url", imageUrl);
+		RequestEntity<String> request = new RequestEntity<>(headers, HttpMethod.GET, builder.build().toUri());
+		ResponseEntity<ColorResponseDto> responseColor = restTemplate.exchange(request, ColorResponseDto.class);		 
+		List<String> colors = responseColor.getBody().getResult().getColors().getForegroundColors().stream().map(e -> e.getName()).collect(Collectors.toList());
+		System.out.println(colors);
+		
+		builder = UriComponentsBuilder.fromHttpUrl(tagUrl).queryParam("image_url", imageUrl).queryParam("threshold", 50);
+		request = new RequestEntity<>(headers, HttpMethod.GET, builder.build().toUri());
+		ResponseEntity<TagResponseDto>responseTag = restTemplate.exchange(request, TagResponseDto.class);
+		List<String> tags = responseTag.getBody().getResult().getTags().stream().map(e -> e.getTag().getWord()).collect(Collectors.toList());
+ 		System.out.println(tags);
+ 		tags.addAll(colors);
+		return tags;
+	}
 }
