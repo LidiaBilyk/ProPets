@@ -1,7 +1,5 @@
 package telran.ProPets;
 
-import java.time.LocalDateTime;
-
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

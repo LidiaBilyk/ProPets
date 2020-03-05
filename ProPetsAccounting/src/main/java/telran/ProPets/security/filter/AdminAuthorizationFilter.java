@@ -32,19 +32,20 @@ public class AdminAuthorizationFilter implements Filter {
 			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
-		String path = request.getServletPath();
+		String path = request.getServletPath();		
 		Principal principal = request.getUserPrincipal();		
 		if (principal != null) {
 			UserAccount userAccount = repository.findById(principal.getName()).get();			
-			if (checkPointCut(userAccount.getRoles(),path)) {		
-					return;				
+			if (checkPointCut(userAccount.getRoles(),path)) {
+				response.sendError(401, "Header Authorization is not valid");
+				return;				
 			} 
 		}
 		chain.doFilter(request, response);
 	}
 	
 	private boolean checkPointCut(List<String> roles, String path) {
-		boolean check = !roles.contains("Administrator") && path.matches("/account/(\\w+)/role/(\\w+)");
+		boolean check = !roles.contains("Administrator") && path.matches(".+/role/.+");		
 		return check;
 	}
 
