@@ -10,7 +10,7 @@ import lombok.Singular;
 
 @Getter
 @Builder
-public class PostResponceDto {
+public class PostResponseDto {
 	String id;
 	String userLogin;
 	LocalDateTime datePost;	

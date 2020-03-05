@@ -140,6 +140,7 @@ public class PostServiceImpl implements PostService {
 		Example<Post> example = Example.of(post, createExampleMatcher());
 		Page<Post> page = postRepository.findAll(example, pageable);		
 		return pageToPageDto(page);
+
 	}
 
 	private ExampleMatcher createExampleMatcher() {

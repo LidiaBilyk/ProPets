@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserRegisterResponceDto {
+public class UserRegisterResponseDto {
 	
 	String email;	
 	String name;

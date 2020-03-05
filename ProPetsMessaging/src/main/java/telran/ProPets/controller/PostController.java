@@ -7,13 +7,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import telran.ProPets.dto.PageDto;
 import telran.ProPets.dto.PostDto;
-import telran.ProPets.dto.PostResponceDto;
+import telran.ProPets.dto.PostResponseDto;
 import telran.ProPets.service.PostService;
 
 @RestController
@@ -24,27 +25,27 @@ public class PostController {
 	PostService postService;
 	
 	@PostMapping("/{login:.*}")
-	public PostResponceDto post(@PathVariable String login, @RequestBody PostDto postDto) {
+	public PostResponseDto post(@PathVariable String login, @RequestBody PostDto postDto, @RequestHeader(value = "X-token") String token) {
 		return postService.post(login, postDto);
 	}
 
 	@GetMapping("/{id:.*}")
-	public PostResponceDto getPostById(@PathVariable String id) {
+	public PostResponseDto getPostById(@PathVariable String id, @RequestHeader(value = "X-token") String token) {
 		return postService.getPostById(id);
 	}
 	
 	@PutMapping("/{id:.*}")
-	public PostResponceDto updatePost(@PathVariable String id, @RequestBody PostResponceDto postDto) {
+	public PostResponseDto updatePost(@PathVariable String id, @RequestBody PostResponseDto postDto, @RequestHeader(value = "X-token") String token) {
 		return postService.updatePost(id, postDto);
 	}
 	
 	@DeleteMapping("/{id:.*}")
-	public PostResponceDto deletePost(@PathVariable String id) {
+	public PostResponseDto deletePost(@PathVariable String id, @RequestHeader(value = "X-token") String token) {
 		return postService.deletePost(id);
 	}
 	
 	@GetMapping("/view")
-	public PageDto getPosts(@RequestParam Integer itemsOnPage, @RequestParam Integer currentPage) {
+	public PageDto getPosts(@RequestParam Integer itemsOnPage, @RequestParam Integer currentPage, @RequestHeader(value = "X-token") String token) {
 		return postService.getPosts(itemsOnPage, currentPage);
 	}
 }

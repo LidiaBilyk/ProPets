@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
@@ -36,7 +37,7 @@ public class UserAccount implements Serializable{
 	String avatar;
 	String phone;
 	@Singular
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	List<String> roles;
 	boolean block;
 	

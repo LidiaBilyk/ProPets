@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import telran.ProPets.dao.PostRepository;
 import telran.ProPets.dto.PageDto;
 import telran.ProPets.dto.PostDto;
-import telran.ProPets.dto.PostResponceDto;
+import telran.ProPets.dto.PostResponseDto;
 import telran.ProPets.exceptions.NotFoundException;
 import telran.ProPets.model.Post;
 
@@ -24,7 +24,7 @@ public class PostServiceImpl implements PostService {
 	PostRepository postRepository;
 
 	@Override
-	public PostResponceDto post(String login, PostDto postDto) {
+	public PostResponseDto post(String login, PostDto postDto) {
 		Post post = Post.builder()
 				.userLogin(login)
 				.datePost(LocalDateTime.now())
@@ -37,8 +37,8 @@ public class PostServiceImpl implements PostService {
 		return postToPostResponceDto(post);
 	}
 
-	private PostResponceDto postToPostResponceDto(Post post) {		
-		return PostResponceDto.builder()
+	private PostResponseDto postToPostResponceDto(Post post) {		
+		return PostResponseDto.builder()
 				.id(post.getId())
 				.userLogin(post.getUserLogin())
 				.text(post.getText())
@@ -48,13 +48,14 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public PostResponceDto getPostById(String id) {
+	public PostResponseDto getPostById(String id) {
+		System.out.println("get post");
 		Post post = postRepository.findById(id).orElseThrow(() -> new NotFoundException());		
 		return postToPostResponceDto(post);
 	}
 
 	@Override
-	public PostResponceDto updatePost(String id, PostResponceDto postResponceDto) {
+	public PostResponseDto updatePost(String id, PostResponseDto postResponceDto) {
 		Post post = postRepository.findById(id).orElseThrow(() -> new NotFoundException());
 		if (postResponceDto.getImages() != null) {
 			post.setImages(postResponceDto.getImages());
@@ -68,9 +69,9 @@ public class PostServiceImpl implements PostService {
 
 	@Transactional
 	@Override		
-	public PostResponceDto deletePost(String id) {
+	public PostResponseDto deletePost(String id) {
 		Post post = postRepository.findById(id).orElseThrow(() -> new NotFoundException());
-		PostResponceDto postResponceDto = postToPostResponceDto(post);
+		PostResponseDto postResponceDto = postToPostResponceDto(post);
 		postRepository.deleteById(id);
 		return postResponceDto;
 	}

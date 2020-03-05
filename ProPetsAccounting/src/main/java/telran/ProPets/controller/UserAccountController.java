@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import telran.ProPets.dto.RolesDto;
 import telran.ProPets.dto.UserProfileDto;
 import telran.ProPets.dto.UserRegisterDto;
-import telran.ProPets.dto.UserRegisterResponceDto;
+import telran.ProPets.dto.UserRegisterResponseDto;
 import telran.ProPets.service.UserAccountService;
 
 @RestController
@@ -28,7 +27,7 @@ public class UserAccountController {
 	UserAccountService userAccountService;
 	
 	@PostMapping
-	public UserRegisterResponceDto registerUser(@RequestBody UserRegisterDto userRegisterDto) {
+	public UserRegisterResponseDto registerUser(@RequestBody UserRegisterDto userRegisterDto) {
 		return userAccountService.registerUser(userRegisterDto);
 	}
 
@@ -38,32 +37,37 @@ public class UserAccountController {
 	}
 	
 	@GetMapping("/{login:.*}/info")
-	public UserProfileDto getUserById(@PathVariable String login) {		
+	public UserProfileDto getUserById(@PathVariable String login, @RequestHeader(value = "X-token") String token) {		
 		return userAccountService.getUserById(login);
 	}
 	
 	@PutMapping
-	public UserProfileDto updateUser(Principal principal, @RequestBody UserProfileDto userProfileDto) {
+	public UserProfileDto updateUser(Principal principal, @RequestBody UserProfileDto userProfileDto, @RequestHeader(value = "X-token") String token) {
 		return userAccountService.updateUser(principal.getName(), userProfileDto);
 	}
 	
 	@DeleteMapping
-	public UserProfileDto deleteUser(Principal principal) {
+	public UserProfileDto deleteUser(Principal principal, @RequestHeader(value = "X-token") String token) {
 		return userAccountService.deleteUser(principal.getName());
 	}
 	
-	@PutMapping("/{login:.*}/roles")
-	public List<String> addRole(@PathVariable String login, @RequestBody RolesDto rolesDto) {		
-		return userAccountService.addRole(login, rolesDto);
+	@PutMapping("/{login:.*}/role/{role}")
+	public List<String> addRole(@PathVariable String login, @PathVariable String role, @RequestHeader(value = "X-token") String token) {		
+		return userAccountService.addRole(login, role);
 	}
 	
-//	@DeleteMapping("/role")
-//	public List<String> removeRole(@RequestParam String userLogin, @RequestParam String role) {
-//		return userAccountService.removeRole(userLogin, role);
-//	}
+	@DeleteMapping("/{login:.*}/role/{role}")
+	public List<String> removeRole(@PathVariable String login, @PathVariable String role, @RequestHeader(value = "X-token") String token) {		
+		return userAccountService.removeRole(login, role);
+	}
 	
 	@PutMapping("{login:.*}/block/{block}")
-	public boolean blockUser(@PathVariable String login, @PathVariable boolean block) {
+	public boolean blockUser(@PathVariable String login, @PathVariable boolean block, @RequestHeader(value = "X-token") String token) {
 		return userAccountService.blockUser(login, block);
+	}
+	
+	@GetMapping("/token/validation")
+	public void tokenValidation() {
+		
 	}
 }

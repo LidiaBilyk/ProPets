@@ -12,6 +12,6 @@ public class PageDto {
 	Integer itemsOnPage;
 	Integer currentPage;
 	Long itemsTotal;
-	List<PostResponceDto> posts;
+	List<PostResponseDto> posts;
 
 }
