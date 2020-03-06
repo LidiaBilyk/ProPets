@@ -83,7 +83,7 @@ public class AuthenticationFilter implements Filter {
 	}
 
 	public String createJwt(String login) {
-		long term = 60000;
+		long term = 900000;
 		String secret = "123_Password";
 		SignatureAlgorithm signatureAlgotithm = SignatureAlgorithm.HS256;
 		long nowMillis = System.currentTimeMillis();

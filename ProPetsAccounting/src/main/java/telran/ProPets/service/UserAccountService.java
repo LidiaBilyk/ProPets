@@ -22,6 +22,6 @@ public interface UserAccountService {
 	List<String> addRole(String userLogin, String role);
 	List<String> removeRole(String userLogin, String role);
 	boolean blockUser(String login, boolean block);
-	void checkJwt();
+	ResponseEntity<String> checkJwt(String token);
 
 }

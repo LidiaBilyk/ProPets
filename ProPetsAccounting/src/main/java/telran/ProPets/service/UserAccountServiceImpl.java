@@ -9,15 +9,16 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import telran.ProPets.dao.UserAccountRepository;
-import telran.ProPets.dto.RolesDto;
 import telran.ProPets.dto.UserProfileDto;
 import telran.ProPets.dto.UserRegisterDto;
 import telran.ProPets.dto.UserRegisterResponseDto;
@@ -28,6 +29,8 @@ import telran.ProPets.model.UserAccount;
 
 @Service
 public class UserAccountServiceImpl implements UserAccountService {
+	
+	String secret = "123_Password";	
 
 	@Autowired
 	UserAccountRepository userAccountRepository;
@@ -139,51 +142,49 @@ public class UserAccountServiceImpl implements UserAccountService {
 	}
 
 	@Override
-	public void checkJwt() {
-//		String secret = "123_Password";		
-//		HttpHeaders headers = new HttpHeaders();
-//		System.out.println(headers);
-//			
-//		System.out.println("have token");
-//		try {
-//		Claims claims = verifyJwt(header, secret);
-//		} catch (Exception e) {
-//			System.out.println("token is broken");
-//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//		}
-//		System.out.println("token verified");
-//
-//		String jwt = createJwt(header, secret);
-//		System.out.println("token updated");
-//		headers.add("X-Token", jwt);
-//		System.out.println(headers);
-//		return new ResponseEntity<>(headers, HttpStatus.OK);
+	public ResponseEntity<String> checkJwt(String token) {					
+		Claims claims = null;		
+		try {
+		claims = verifyJwt(token, secret);
+		} catch (Exception e) {			
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}			
+		UserAccount userAccount = userAccountRepository.findById(claims.getSubject()).orElse(null);		
+		if (userAccount == null) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		String jwt = createJwt(claims.getSubject(), secret);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Token", jwt);
+		headers.add("X-Avatar", userAccount.getAvatar());
+		headers.add("X-UserName", userAccount.getName());
+		return new ResponseEntity<>(headers, HttpStatus.OK);
 	}
 
-//	public String createJwt(String auth, String secret) {
-//		long term = 900000;
-//		SignatureAlgorithm signatureAlgotithm = SignatureAlgorithm.HS256;
-//		long nowMillis = System.currentTimeMillis();
-//		Date now = new Date(nowMillis);
-//		long expMillis = nowMillis + term;
-//		Date exp = new Date(expMillis);
-//		byte[] keySecret = DatatypeConverter.parseBase64Binary(secret);
-//		Key signingKey = new SecretKeySpec(keySecret, signatureAlgotithm.getJcaName());
-//		JwtBuilder jwtBuilder = Jwts.builder()
-//				.setIssuedAt(now)
-//				.setSubject(auth)
-//				.setExpiration(exp)
-//				.signWith(signatureAlgotithm, signingKey);
-//
-//		return jwtBuilder.compact();
-//	}
-//
-//	public Claims verifyJwt(String jwt, String secret) {
-//		Claims claims = Jwts.parser()
-//				.setSigningKey(DatatypeConverter.parseBase64Binary(secret))
-//				.parseClaimsJws(jwt)
-//				.getBody();
-//		return claims;
-//	}
+	public String createJwt(String login, String secret) {
+		long term = 900000;
+		SignatureAlgorithm signatureAlgotithm = SignatureAlgorithm.HS256;
+		long nowMillis = System.currentTimeMillis();
+		Date now = new Date(nowMillis);
+		long expMillis = nowMillis + term;
+		Date exp = new Date(expMillis);
+		byte[] keySecret = DatatypeConverter.parseBase64Binary(secret);
+		Key signingKey = new SecretKeySpec(keySecret, signatureAlgotithm.getJcaName());
+		JwtBuilder jwtBuilder = Jwts.builder()
+				.setIssuedAt(now)
+				.setSubject(login)
+				.setExpiration(exp)
+				.signWith(signatureAlgotithm, signingKey);
 
+		return jwtBuilder.compact();
+	}
+
+	public Claims verifyJwt(String jwt, String secret) {
+		Claims claims = Jwts.parser()
+				.setSigningKey(DatatypeConverter.parseBase64Binary(secret))
+				.parseClaimsJws(jwt)
+				.getBody();
+		return claims;
+	}
+	
 }

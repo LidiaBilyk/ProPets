@@ -58,7 +58,7 @@ public class JwtFilter implements Filter {
 	}
 	
 	public String createJwt(String login) {
-		long term = 60000;
+		long term = 900000;
 		
 		SignatureAlgorithm signatureAlgotithm = SignatureAlgorithm.HS256;
 		long nowMillis = System.currentTimeMillis();
@@ -85,7 +85,7 @@ public class JwtFilter implements Filter {
 	
 	private boolean checkPointCut(String path, String method) {
 		boolean check = path.matches("/\\w*/account/v1") && "Post".equalsIgnoreCase(method);
-		check = check || path.startsWith("/h2") || path.matches("/\\w*/account/v1/login");
+		check = check || path.startsWith("/h2") || path.matches("/\\w*/account/v1/login") || path.matches(".*/token/validation");
 		return check;
 	}
 	

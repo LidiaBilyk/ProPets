@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,13 +62,14 @@ public class UserAccountController {
 		return userAccountService.removeRole(login, role);
 	}
 	
-	@PutMapping("{login:.*}/block/{block}")
+	@PutMapping("/{login:.*}/block/{block}")
 	public boolean blockUser(@PathVariable String login, @PathVariable boolean block, @RequestHeader(value = "X-token") String token) {
 		return userAccountService.blockUser(login, block);
 	}
 	
 	@GetMapping("/token/validation")
-	public void tokenValidation() {
+	public ResponseEntity<String> tokenValidation(@RequestHeader(value = "X-Token")String token) {
+		return userAccountService.checkJwt(token);
 		
 	}
 }
